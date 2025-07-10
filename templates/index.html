@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Tracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Bike Usage Tracker</h1>
+    <div class="flexHorizontal">
+        <div class="flexVertical">
+            <form id="dataForm">
+                <input type="date" id="day" required>
+                <br/>
+                <br/>
+                <input type="number" step="any" id="speed" placeholder="Speed (km/h)" required>
+                <br/>
+                <br/>
+                <input type="number" step="any" id="distance" placeholder="Distance (km)" required>
+                <br/>
+                <br/>
+                <input type="number" step="any" id="time" placeholder="Time (min)" required>
+                <br/>
+                <br/>
+                <button type="submit">🚲</button>
+            </form>
+            <a id="nightOrLight" onclick="setNightOrLight()">🌚</a>
+        </div>
+        <div style="width: 5%;"></div>
+        <div class="flexVertical">
+            <div id="stats"></div>
+            <input type="range" min="1" max="3" value="1" class="slider" id="timeRange">
+            <img id="usageChart" src="" alt="Usage Chart">
+        </div>
+    </div>
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
