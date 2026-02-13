@@ -5,83 +5,58 @@
 ####
 #####
 
-from flask import Flask, render_template, request, jsonify, send_file
-import sqlite3
-import pandas as pd
-from plotnine import ggplot, aes, geom_col, labs, theme_xkcd, coord_flip, guides
-from io import BytesIO
-import matplotlib
-matplotlib.use('Agg')  # Set the backend to 'Agg' to avoid GUI-related issues
+"""
+TODO
 
-from utils import init_db, __bike__
+create tabs for plotly elements to switch between date distance speed time
+add calories computation for the json
+add calories to the plotly tabs
+"""
 
-# Globals
-app = Flask(__name__)
+from nicegui import ui
+from statistics import mean
+import json
+import plotly.graph_objects as go
 
-#-------------------------
-@app.route('/')
-def index():
-    init_db()
-    return render_template('index.html')
+## GLOBALS
+with open("bike_data.json") as j:
+    bike_data_dict = json.load(j)
 
-@app.route('/add_data', methods=['POST'])
-def add_data():
-    data = request.json
-    conn = sqlite3.connect(__bike__)
-    c = conn.cursor()
-    c.execute("INSERT INTO bike_data (day, speed, distance, time) VALUES (?, ?, ?, ?)",
-              (data['day'], data['speed'], data['distance'], data['time']))
-    conn.commit()
-    conn.close()
-    return jsonify({"status": "success"})
+# Functions --------------------
+def send_data_to_json() -> None:
+    bike_data_dict["date"].append(date.value)
+    bike_data_dict["distance"].append(distance.value)
+    bike_data_dict["speed"].append(speed.value)
+    bike_data_dict["time"].append(time.value)
+    with open("bike_data.json", 'w') as j:
+        json.dump(bike_data_dict, j)
+    ui.notify(f"Data for {date.value} added to the database")
 
-@app.route('/get_data')
-def get_data():
-    conn = sqlite3.connect(__bike__)
-    c = conn.cursor()
-    c.execute("SELECT * FROM bike_data")
-    data = c.fetchall()
-    conn.close()
-    return jsonify(data)
+# UI Elements --------------------
+with ui.row(wrap=False):
+    with ui.card():
+        date = ui.date_input("Day")
 
-@app.route('/plot')
-def plot():
-    time_range = request.args.get('time_range', 'day')
+        with ui.row():
+            distance = ui.number(label="km", 
+                                 value=mean(bike_data_dict['distance']), 
+                                 precision=2)
+            speed = ui.number(label="avg km/h", 
+                              value=mean(bike_data_dict['speed']), 
+                              precision=2)
+            time = ui.number(label="minutes", 
+                             value=mean(bike_data_dict['time']))
 
-    conn = sqlite3.connect(__bike__)
-    df = pd.read_sql_query("SELECT * FROM bike_data", conn)
-    conn.close()
-
-    df['day'] = pd.to_datetime(df['day'])
-
-    if time_range == 'month':
-        df['month'] = df['day'].dt.to_period('M')
-        plot_data = df.groupby('month')['distance', 'time'].sum().reset_index()
-        plot_data['month'] = plot_data['month'].astype(str)
-        x_label = 'month'
-    elif time_range == 'year':
-        df['year'] = df['day'].dt.to_period('Y')
-        plot_data = df.groupby('year')['distance', 'time'].sum().reset_index()
-        plot_data['year'] = plot_data['year'].astype(str)
-        x_label = 'year'
-    else:
-        plot_data = df
-        x_label = 'day'
-
-    plot = (
-        ggplot(plot_data, aes(x=x_label, y='distance', fill='time')) +
-        geom_col(alpha=.2, color='black') +
-        labs(title='Bike Usage', x=x_label.title(), y='Distance (km)') +
-        guides(fill="none") +
-        theme_xkcd() + coord_flip()
-    )
-
-    stream = BytesIO()
-    plot.save(stream, format='png', dpi=300)
-    stream.seek(0)
-
-    return send_file(stream, mimetype='image/png')
+        ui.button("Add data", 
+                  on_click=send_data_to_json, 
+                  icon='directions_bike')
+    fig = go.Figure(go.Scatter(x=bike_data_dict['date'], y=bike_data_dict['distance']))
+    fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
+    ui.plotly(fig).classes('w-full h-80')
 
 
-if __name__ == '__main__':
-    app.run(debug=True, port=1620)
+# App run --------------------
+ui.run(port=1620, 
+       title="Bike tracker app", 
+       favicon="icon.png",
+       reload=False)
