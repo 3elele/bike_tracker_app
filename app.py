@@ -5,13 +5,6 @@
 ####
 #####
 
-"""
-TODO
-
-create tabs for plotly elements to switch between date distance speed time
-add calories to the plotly tabs
-"""
-
 from nicegui import ui
 from statistics import mean
 import json
