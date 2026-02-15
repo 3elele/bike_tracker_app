@@ -45,7 +45,7 @@ def set_met_value(speed: int) -> int:
         met = 9
     elif speed <= 24:
         met = 10
-    elif _:
+    else:
         met = 0
 
     return met
