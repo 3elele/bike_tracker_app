@@ -54,12 +54,12 @@ def set_met_value(speed: int) -> int:
         case 24:
             met = 10
         case _:
-            met = None  # or any default value
+            met = 0
 
     return met
 
 def calculate_calories(speed: int, time_in_minutes: int, weight: int = 77) -> int:
-    met = set_met_value(speed)
+    met = set_met_value(int(speed))
     calories = met * weight * (time_in_minutes // 60)
 
     return calories
@@ -69,7 +69,8 @@ def send_data_to_json() -> None:
     bike_data_dict["km"].append(km.value)
     bike_data_dict["speed"].append(speed.value)
     bike_data_dict["minutes"].append(minutes.value)
-    bike_data_dict["kgcal"].append(calculate_calories())
+    bike_data_dict["kgcal"].append(calculate_calories(speed.value,
+                                                      minutes.value))
     with open("bike_data.json", "w") as j:
         json.dump(bike_data_dict, j)
     ui.notify(f"Data for {date.value} added to the database")
@@ -77,15 +78,18 @@ def send_data_to_json() -> None:
 # UI Elements --------------------
 with ui.row(wrap=False):
     with ui.card():
-        date = ui.date_input("Day")
+        date = ui.date_input("Day",
+                             value="2025-15-04")
 
         with ui.row():
             km = ui.number(label="km", 
                                  value=mean(bike_data_dict["km"]), 
-                                 precision=2)
+                                 precision=2,
+                                 step=0.1)
             speed = ui.number(label="avg km/h", 
                               value=mean(bike_data_dict["speed"]), 
-                              precision=2)
+                              precision=2,
+                              step=0.1)
             minutes = ui.number(label="minutes", 
                              value=mean(bike_data_dict["minutes"]))
 
