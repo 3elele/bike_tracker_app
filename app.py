@@ -25,44 +25,52 @@ except FileNotFoundError:
 
 # Functions --------------------
 def set_met_value(speed: int) -> int:
-    match speed:
-        case _ if speed <= 6:
-            met = 1
-        case 8:
-            met = 2
-        case 10:
-            met = 3
-        case 12:
-            met = 4
-        case 14:
-            met = 5
-        case 16:
-            met = 6
-        case 18:
-            met = 7
-        case 20:
-            met = 8
-        case 22:
-            met = 9
-        case 24:
-            met = 10
-        case _:
-            met = 0
+    if speed <= 6:
+        met = 1
+    elif speed <= 8:
+        met = 2
+    elif speed <= 10:
+        met = 3
+    elif speed <= 12:
+        met = 4
+    elif speed <= 14:
+        met = 5
+    elif speed <= 16:
+        met = 6
+    elif speed <= 18:
+        met = 7
+    elif speed <= 20:
+        met = 8
+    elif speed <= 22:
+        met = 9
+    elif speed <= 24:
+        met = 10
+    elif _:
+        met = 0
 
     return met
 
 def calculate_calories(speed: int, time_in_minutes: int, weight: int = 77) -> int:
     met = set_met_value(int(speed))
     calories = met * weight * (time_in_minutes // 60)
+    print(met, weight, (time_in_minutes // 60), calories)
 
     return calories
 
 def send_data_to_json() -> None:
-    bike_data_dict["date"].append(date.value)
-    bike_data_dict["km"].append(km.value)
-    bike_data_dict["speed"].append(speed.value)
-    bike_data_dict["minutes"].append(minutes.value)
-    bike_data_dict["kgcal"].append(calculate_calories(speed.value,
+    if date.value in bike_data_dict["date"]:
+        date_id = bike_data_dict["date".index(date.value)]
+        bike_data_dict["km"][date_id] = km.value
+        bike_data_dict["speed"][date_id] = speed.value
+        bike_data_dict["minutes"][date_id] = int(minutes.value)
+        bike_data_dict["kgcal"][date_id] = calculate_calories(speed.value,
+                                                              minutes.value)
+    else:
+        bike_data_dict["date"].append(date.value)
+        bike_data_dict["km"].append(km.value)
+        bike_data_dict["speed"].append(speed.value)
+        bike_data_dict["minutes"].append(int(minutes.value))
+        bike_data_dict["kgcal"].append(calculate_calories(speed.value,
                                                       minutes.value))
     with open("bike_data.json", "w") as j:
         json.dump(bike_data_dict, j)
