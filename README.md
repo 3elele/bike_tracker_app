@@ -29,6 +29,4 @@ python app.py
 
 - Add possibility to change database input
 - Add CSV import for more convenient data creation
-- Add calories to the plotly tabs
 - Change plotting library to have interactive plots
-- Create tabs for plotly elements to switch between date distance speed time
