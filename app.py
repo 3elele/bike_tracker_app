@@ -1,4 +1,3 @@
-
 import json
 from statistics import mean
 
@@ -11,13 +10,14 @@ try:
         bike_data_dict = json.load(j)
 except FileNotFoundError:
     bike_data_dict = {
-        "date":["2025-14-04"],
-        "km":[9.66],
-        "speed":[18.5], 
-        "minutes":[60],
-        "kcal":[616],
+        "date": ["2025-14-04"],
+        "km": [9.66],
+        "speed": [18.5],
+        "minutes": [60],
+        "kcal": [616],
     }
-margin_dict={"l":0, "r":0, "t":0, "b":0}
+margin_dict = {"l": 0, "r": 0, "t": 0, "b": 0}
+
 
 # Functions --------------------
 def set_met_value(speed: int) -> int:
@@ -54,12 +54,14 @@ def set_met_value(speed: int) -> int:
 
     return met
 
+
 def calculate_calories(speed: int, time_in_minutes: int, weight: int = 77) -> int:
     met = set_met_value(int(speed))
     calories = met * weight * (time_in_minutes // 60)
-#    print(met, weight, (time_in_minutes // 60), calories)
+    #    print(met, weight, (time_in_minutes // 60), calories)
 
     return calories
+
 
 def send_data_to_json() -> None:
     if date.value in bike_data_dict["date"]:
@@ -67,42 +69,47 @@ def send_data_to_json() -> None:
         bike_data_dict["km"][date_id] = km.value
         bike_data_dict["speed"][date_id] = speed.value
         bike_data_dict["minutes"][date_id] = int(minutes.value)
-        bike_data_dict["kcal"][date_id] = calculate_calories(speed.value,
-                                                              minutes.value)
+        bike_data_dict["kcal"][date_id] = calculate_calories(speed.value, minutes.value)
     else:
         bike_data_dict["date"].append(date.value)
         bike_data_dict["km"].append(km.value)
         bike_data_dict["speed"].append(speed.value)
         bike_data_dict["minutes"].append(int(minutes.value))
-        bike_data_dict["kcal"].append(calculate_calories(speed.value,
-                                                      minutes.value))
+        bike_data_dict["kcal"].append(calculate_calories(speed.value, minutes.value))
     with open("bike_data.json", "w") as j:
         json.dump(bike_data_dict, j)
     ui.notify(f"Data for {date.value} added to the database")
 
+
 # UI Elements --------------------
 with ui.row():
     with ui.card():
-        date = ui.date_input("Day",
-                             value="2025-15-04")
+        date = ui.date_input("Day", value="2025-15-04")
 
         with ui.row():
-            speed = ui.number(label="avg km/h", 
-                              value=mean(bike_data_dict["speed"]), 
-                              precision=2,
-                              step=0.1)
-            km = ui.number(label="km", 
-                                 value=mean(bike_data_dict["km"]), 
-                                 precision=2,
-                                 step=0.1)
-            minutes = ui.number(label="minutes", 
-                             value=mean(bike_data_dict["minutes"]))
+            speed = ui.number(
+                label="avg km/h",
+                value=round(mean(bike_data_dict["speed"]), 2),
+                precision=2,
+                step=0.1,
+            )
+            km = ui.number(
+                label="km",
+                value=round(mean(bike_data_dict["km"]), 2),
+                precision=2,
+                step=0.05,
+            )
+            minutes = ui.number(
+                label="minutes", value=round(mean(bike_data_dict["minutes"]))
+            )
 
-        ui.button("Add data", 
-                  icon="directions_bike").on('click', lambda: (
-                      send_data_to_json(),
-                      ui.navigate.reload(),
-                  ))
+        ui.button("Add data", icon="directions_bike").on(
+            "click",
+            lambda: (
+                send_data_to_json(),
+                ui.navigate.reload(),
+            ),
+        )
 
     with ui.row(wrap=False):
         with ui.tabs().props("vertical") as tabs:
@@ -112,27 +119,29 @@ with ui.row():
             ui.tab("cal", label="Calories", icon="whatshot")
         with ui.tab_panels(tabs, value="km").props("vertical").classes("w-full h-full"):
             with ui.tab_panel("km"):
-                fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
-                                           y=bike_data_dict["km"]))
+                fig = go.Figure(
+                    go.Scatter(x=bike_data_dict["date"], y=bike_data_dict["km"])
+                )
                 fig.update_layout(margin=margin_dict)
                 ui.plotly(fig).classes("w-full h-80")
             with ui.tab_panel("speed"):
-                fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
-                                           y=bike_data_dict["speed"]))
+                fig = go.Figure(
+                    go.Scatter(x=bike_data_dict["date"], y=bike_data_dict["speed"])
+                )
                 fig.update_layout(margin=margin_dict)
                 ui.plotly(fig).classes("w-full h-80")
             with ui.tab_panel("min"):
-                fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
-                                           y=bike_data_dict["minutes"]))
+                fig = go.Figure(
+                    go.Scatter(x=bike_data_dict["date"], y=bike_data_dict["minutes"])
+                )
                 fig.update_layout(margin=margin_dict)
                 ui.plotly(fig).classes("w-full h-80")
             with ui.tab_panel("cal"):
-                fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
-                                           y=bike_data_dict["kcal"]))
+                fig = go.Figure(
+                    go.Scatter(x=bike_data_dict["date"], y=bike_data_dict["kcal"])
+                )
                 fig.update_layout(margin=margin_dict)
                 ui.plotly(fig).classes("w-full h-80")
 
 # App run --------------------
-ui.run(port=1620, 
-       title="Bike tracker app", 
-       favicon="icon.png")
+ui.run(port=1620, title="Bike tracker app", favicon="icon.png")
