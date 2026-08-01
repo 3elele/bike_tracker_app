@@ -11,8 +11,8 @@ try:
 except FileNotFoundError:
     bike_data_dict = {
         "date": ["2025-14-04"],
-        "km": [9.66],
         "speed": [18.5],
+        "km": [9.66],
         "minutes": [60],
         "kcal": [616],
     }
