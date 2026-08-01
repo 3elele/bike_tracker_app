@@ -128,7 +128,7 @@ with ui.row():
                 fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
                                            y=bike_data_dict["kcal"]))
                 fig.update_layout(margin=margin_dict)
-            ui.plotly(fig).classes("w-full h-80")
+                ui.plotly(fig).classes("w-full h-80")
 
 # App run --------------------
 ui.run(port=1620, 
