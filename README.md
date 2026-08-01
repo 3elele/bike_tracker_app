@@ -27,6 +27,6 @@ python app.py
 
 ## TODO
 
-- Add possibility to change database input
-- Add CSV import for more convenient data creation
-- Change plotting library to have interactive plots
+* [] Add possibility to change database input
+* [] Add CSV import for more convenient data creation
+* [] Change plotting library to have interactive plots

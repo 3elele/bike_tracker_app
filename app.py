@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-#
-##
-###
-####
-#####
 
-from nicegui import ui
-from statistics import mean
 import json
+from statistics import mean
+
 import plotly.graph_objects as go
+from nicegui import ui
 
 ## GLOBALS
 try:
@@ -17,11 +12,12 @@ try:
 except FileNotFoundError:
     bike_data_dict = {
         "date":["2025-14-04"],
-        "km":[18.5],
-        "speed":[9.66], 
+        "km":[9.66],
+        "speed":[18.5], 
         "minutes":[60],
-        "kgcal":[539],
+        "kcal":[616],
     }
+margin_dict={"l":0, "r":0, "t":0, "b":0}
 
 # Functions --------------------
 def set_met_value(speed: int) -> int:
@@ -71,21 +67,21 @@ def send_data_to_json() -> None:
         bike_data_dict["km"][date_id] = km.value
         bike_data_dict["speed"][date_id] = speed.value
         bike_data_dict["minutes"][date_id] = int(minutes.value)
-        bike_data_dict["kgcal"][date_id] = calculate_calories(speed.value,
+        bike_data_dict["kcal"][date_id] = calculate_calories(speed.value,
                                                               minutes.value)
     else:
         bike_data_dict["date"].append(date.value)
         bike_data_dict["km"].append(km.value)
         bike_data_dict["speed"].append(speed.value)
         bike_data_dict["minutes"].append(int(minutes.value))
-        bike_data_dict["kgcal"].append(calculate_calories(speed.value,
+        bike_data_dict["kcal"].append(calculate_calories(speed.value,
                                                       minutes.value))
     with open("bike_data.json", "w") as j:
         json.dump(bike_data_dict, j)
     ui.notify(f"Data for {date.value} added to the database")
 
 # UI Elements --------------------
-with ui.row(wrap=False):
+with ui.row():
     with ui.card():
         date = ui.date_input("Day",
                              value="2025-15-04")
@@ -106,31 +102,32 @@ with ui.row(wrap=False):
                   on_click=send_data_to_json, 
                   icon="directions_bike")
 
-    with ui.tabs().props("vertical") as tabs:
-        ui.tab("km", label="Distance", icon="add_road")
-        ui.tab("speed", label="Speed", icon="speed")
-        ui.tab("min", label="Time", icon="timer")
-        ui.tab("cal", label="Calories", icon="whatshot")
-    with ui.tab_panels(tabs, value="km").props("vertical").classes("w-full h-full"):
-        with ui.tab_panel("km"):
-            fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
-                                       y=bike_data_dict["km"]))
-            fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
-            ui.plotly(fig).classes("w-full h-80")
-        with ui.tab_panel("speed"):
-            fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
-                                       y=bike_data_dict["speed"]))
-            fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
-            ui.plotly(fig).classes("w-full h-80")
-        with ui.tab_panel("min"):
-            fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
-                                       y=bike_data_dict["minutes"]))
-            fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
-            ui.plotly(fig).classes("w-full h-80")
-        with ui.tab_panel("cal"):
-            fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
-                                       y=bike_data_dict["kgcal"]))
-            fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
+    with ui.row(wrap=False):
+        with ui.tabs().props("vertical") as tabs:
+            ui.tab("km", label="Distance", icon="add_road")
+            ui.tab("speed", label="Speed", icon="speed")
+            ui.tab("min", label="Time", icon="timer")
+            ui.tab("cal", label="Calories", icon="whatshot")
+        with ui.tab_panels(tabs, value="km").props("vertical").classes("w-full h-full"):
+            with ui.tab_panel("km"):
+                fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
+                                           y=bike_data_dict["km"]))
+                fig.update_layout(margin=margin_dict)
+                ui.plotly(fig).classes("w-full h-80")
+            with ui.tab_panel("speed"):
+                fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
+                                           y=bike_data_dict["speed"]))
+                fig.update_layout(margin=margin_dict)
+                ui.plotly(fig).classes("w-full h-80")
+            with ui.tab_panel("min"):
+                fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
+                                           y=bike_data_dict["minutes"]))
+                fig.update_layout(margin=margin_dict)
+                ui.plotly(fig).classes("w-full h-80")
+            with ui.tab_panel("cal"):
+                fig = go.Figure(go.Scatter(x=bike_data_dict["date"],
+                                           y=bike_data_dict["kcal"]))
+                fig.update_layout(margin=margin_dict)
             ui.plotly(fig).classes("w-full h-80")
 
 # App run --------------------
