@@ -1,7 +1,9 @@
+import datetime
 import json
 from statistics import mean
 
 import plotly.graph_objects as go
+import pytz
 from nicegui import ui
 
 ## GLOBALS
@@ -9,15 +11,10 @@ try:
     with open("bike_data.json") as j:
         bike_data_dict = json.load(j)
 except FileNotFoundError:
-    bike_data_dict = {
-        "date": ["2025-14-04"],
-        "speed": [18.5],
-        "km": [9.66],
-        "minutes": [60],
-        "kcal": [616],
-    }
+    with open("bike_data_exemple.json") as j:
+        bike_data_dict = json.load(j)
 margin_dict = {"l": 0, "r": 0, "t": 0, "b": 0}
-
+paris_tz = pytz.timezone('Europe/Paris')
 
 # Functions --------------------
 def set_met_value(speed: int) -> int:
@@ -84,7 +81,7 @@ def send_data_to_json() -> None:
 # UI Elements --------------------
 with ui.row():
     with ui.card():
-        date = ui.date_input("Day", value="2025-15-04")
+        date = ui.date_input("Day", value=datetime.datetime.now(paris_tz).date())
 
         with ui.row():
             speed = ui.number(

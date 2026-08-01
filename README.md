@@ -2,16 +2,11 @@
 
 ![GitHub Tag](https://img.shields.io/github/v/tag/3elele/bike_tracker_app)
 
-| :triangular_flag_on_post: DEV VERSION |
-| :--------------------------------------- |
-
 This repository contains the scripts for creating a simple ~~Flask~~ python app to track my (almost) daily bike usage based on [niceGUI](https://github.com/zauberzeug/nicegui).
 
 **Context**. The idea for this app is born from the fact that tracking daily bike usage without a (sometimes) very expensive smart device is nearly impossible. I just have my bike's distance-speed tracker and started to note my usage on a piece of paper. One day I washed my jeans with my piece of paper and WoOoOsh my bike progress is gone... So I started to note my progress on my phone's note app but very quickly I realised that I could just let my computer organise my progress note. That's how bike_tracker_app is born.
 
-The bike tracker app is intended for personal use and in continous development.
-
-An exemple database is present in this repo containing my bike usage from april 2025. 
+The bike tracker app is intended for personal use. An exemple dataset is present in this repo containing my bike usage from april 2025 which is used as default dataset before entering any data to the app.
 
 ## USAGE
 
@@ -30,3 +25,4 @@ python app.py
 * [] Add possibility to change database input
 * [] Add CSV import for more convenient data creation
 * [] Change plotting library to have interactive plots
+* [] Convert to pyproject-based project
