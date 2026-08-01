@@ -99,8 +99,10 @@ with ui.row():
                              value=mean(bike_data_dict["minutes"]))
 
         ui.button("Add data", 
-                  on_click=send_data_to_json, 
-                  icon="directions_bike")
+                  icon="directions_bike").on('click', lambda: (
+                      send_data_to_json(),
+                      ui.navigate.reload(),
+                  ))
 
     with ui.row(wrap=False):
         with ui.tabs().props("vertical") as tabs:
